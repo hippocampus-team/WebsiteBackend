@@ -3,7 +3,7 @@ import os
 import yandexwebdav
 from aiohttp import web
 
-FOLDER = u'/resume/'
+FOLDER = u'/hippocampus/'
 conf = yandexwebdav.Config({
     "user": os.environ.get('YANDEX_LOGIN'),
     "password": os.environ.get('YANDEX_PASSWORD')
