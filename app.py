@@ -24,4 +24,4 @@ async def get_json(request):
 
 app = web.Application()
 app.router.add_get('/json', get_json)
-web.run_app(app, host='localhost')
+web.run_app(app, port=os.getenv('PORT'))
