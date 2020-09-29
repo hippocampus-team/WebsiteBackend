@@ -23,5 +23,5 @@ async def get_json(request):
 
 
 app = web.Application()
-app.router.add_get('/json', get_json)
+app.router.add_get('/cards', get_json)
 web.run_app(app, port=os.getenv('PORT', 8080))
