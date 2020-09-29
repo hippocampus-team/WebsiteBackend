@@ -19,7 +19,9 @@ async def get_json(request):
             jsons.append(conf.download(list(file.keys())[0]).decode('utf-8'))
     for j in jsons:
         response += j + '\n'
-    return web.Response(text=response)
+    return web.Response(text=response, headers={
+        "Access-Control-Allow-Origin": "*"
+    })
 
 
 app = web.Application()
