@@ -3,27 +3,30 @@ import os
 import yandexwebdav
 from aiohttp import web
 
-FOLDER = u'/hippocampus/'
+FOLDER = '/hippocampus/'
+CARDS = FOLDER + 'cards.txt'
+BIOS = FOLDER + 'bios.txt'
+TEAM_BIO = FOLDER + 'teambio.txt'
+CONTACTS = FOLDER + 'contacts.txt'
+
 conf = yandexwebdav.Config({
     "user": os.environ.get('YANDEX_LOGIN'),
     "password": os.environ.get('YANDEX_PASSWORD')
 })
 
 
-async def get_json(request):
-    files = conf.list(FOLDER)
+async def get_cards(request):
     response = ''
-    jsons = list()
-    for file in files:
-        if len(file.keys()):
-            jsons.append(conf.download(list(file.keys())[0]).decode('utf-8'))
-    for j in jsons:
-        response += j + '\n'
-    return web.Response(text=response, headers={
-        "Access-Control-Allow-Origin": "*"
-    })
+    while True:
+        try:
+            response = conf.download(CARDS).decode('utf-8')
+            return web.Response(text=response, headers={
+                "Access-Control-Allow-Origin": "*"
+            })
+        except yandexwebdav.ConnectionException as e:
+            print('ConnectionException: ' + str(e.code))
 
 
 app = web.Application()
-app.router.add_get('/cards', get_json)
+app.router.add_get('/cards', get_cards())
 web.run_app(app, port=os.getenv('PORT', 8080))
