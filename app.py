@@ -28,5 +28,5 @@ async def get_cards(request):
 
 
 app = web.Application()
-app.router.add_get('/cards', get_cards())
+app.router.add_get('/cards', get_cards)
 web.run_app(app, port=os.getenv('PORT', 8080))
