@@ -4,10 +4,12 @@ import yandexwebdav
 from aiohttp import web
 
 FOLDER = '/hippocampus/'
-CARDS = FOLDER + 'cards.txt'
-BIOS = FOLDER + 'bios.txt'
-TEAM_BIO = FOLDER + 'teambio.txt'
-CONTACTS = FOLDER + 'contacts.txt'
+docs = {
+    '/cards': FOLDER + 'cards.txt',
+    '/bios': FOLDER + 'bios.txt',
+    '/teambio': FOLDER + 'teambio.txt',
+    '/contacts': FOLDER + 'contacts.txt'
+}
 
 conf = yandexwebdav.Config({
     "user": os.environ.get('YANDEX_LOGIN'),
@@ -15,11 +17,11 @@ conf = yandexwebdav.Config({
 })
 
 
-async def get_cards(request):
+async def get_json(request):
     response = ''
     while True:
         try:
-            response = conf.download(CARDS).decode('utf-8')
+            response = conf.download(docs[request.path]).decode('utf-8')
             return web.Response(text=response, headers={
                 "Access-Control-Allow-Origin": "*"
             })
@@ -27,6 +29,11 @@ async def get_cards(request):
             print('ConnectionException: ' + str(e.code))
 
 
+def set_routes():
+    for path in docs.keys():
+        app.router.add_get(path, get_json)
+
+
 app = web.Application()
-app.router.add_get('/cards', get_cards)
+set_routes()
 web.run_app(app, port=os.getenv('PORT', 8080))
