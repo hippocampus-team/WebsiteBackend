@@ -2,8 +2,10 @@ import os
 
 import yandexwebdav
 from aiohttp import web
+from aiohttp.web_exceptions import HTTPUnauthorized
 
 FOLDER = '/hippocampus/'
+TRIES = 2
 docs = {
     '/cards': FOLDER + 'cards.txt',
     '/bios': FOLDER + 'bios.txt',
@@ -11,22 +13,24 @@ docs = {
     '/contacts': FOLDER + 'contacts.txt'
 }
 
-conf = yandexwebdav.Config({
+config = yandexwebdav.Config({
     "user": os.environ.get('YANDEX_LOGIN'),
     "password": os.environ.get('YANDEX_PASSWORD')
 })
 
 
 async def get_json(request):
-    response = ''
-    while True:
+    for i in range(TRIES):
         try:
-            response = conf.download(docs[request.path]).decode('utf-8')
+            response = config.download(docs[request.path]).decode('utf-8')
             return web.Response(text=response, headers={
                 "Access-Control-Allow-Origin": "*"
             })
         except yandexwebdav.ConnectionException as e:
             print('ConnectionException: ' + str(e.code))
+        except AttributeError:
+            print('AttributeError')
+    return HTTPUnauthorized()
 
 
 def set_routes():
